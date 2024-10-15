@@ -80,18 +80,18 @@ int main()
      * 3. show    : 127 - 124 = 3
      * 4. quit    : 125 - 124 = 1
      */
-    enum class CommandHash
+    enum class CommandID
     {
       NEW = 2,
       DELETE = 0,
       SHOW = 3,
       QUIT = 1
-    } commandID = static_cast<CommandHash>((commandName[0] | 28) - 124);
+    } commandID = static_cast<CommandID>((commandName[0] | 28) - 124);
 
     // Execute the command
     switch (commandID)
     {
-      case CommandHash::NEW:
+      case CommandID::NEW:
       {
         // Get the score value
         const int score = std::stoi(pop_token());
@@ -107,8 +107,8 @@ int main()
           std::cout << "Warning: Maximum number of players reached.\n";
         }
         break;
-      } // CommandHash::NEW
-      case CommandHash::DELETE:
+      } // CommandID::NEW
+      case CommandID::DELETE:
       {
         // Delete the players
         while (!tokens.empty())
@@ -131,8 +131,8 @@ int main()
           }
         }
         break;
-      } // CommandHash::DELETE
-      case CommandHash::SHOW:
+      } // CommandID::DELETE
+      case CommandID::SHOW:
       {
         const auto display_player = [](const Player& player)
         {
@@ -163,11 +163,11 @@ int main()
           }
         }
         break;
-      } // CommandHash::SHOW
-      case CommandHash::QUIT:
+      } // CommandID::SHOW
+      case CommandID::QUIT:
       {
         return 0;
-      } // CommandHash::QUIT
+      } // CommandID::QUIT
     }
   }
 }
