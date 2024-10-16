@@ -14,11 +14,11 @@ class Temperature {
 		       degreesFahrenheit,
 		       degreesCelsius;
 	public:
-		void setTempKelvin(double degreesKelvin) {  }
+		void setTempKelvin(double degreesKelvin) { this->degreesKelvin = degreesKelvin; }
 		double getTempKelvin() { return degreesKelvin; }
-		void setTempCelsius() { double degreesCelsius = degreesKelvin - 273.15; }
+		void setTempCelsius() { degreesCelsius = degreesKelvin - 273.15; }
 		double getTempCelsius() { return degreesCelsius; } 
-		void setTempFahrenheit() { double degreesFahrenheit = degreesCelsius * 9.0 / 5.0 + 32.0; }
+		void setTempFahrenheit() { degreesFahrenheit = degreesCelsius * 9.0 / 5.0 + 32.0; }
 		double getTempFahrenheit() { return degreesFahrenheit; }
 };
 
@@ -26,12 +26,15 @@ int main() {
 	Temperature temp;
 
 	double kelvin;
-
+	std::string kelvinString_input;
 	std::cout << "Enter the temperature in Kelvin: ";
-	std::cin >> kelvin;
+	std::cin >> kelvinString_input;
+	kelvin = std::stod(kelvinString_input);
 
 	temp.setTempKelvin(kelvin);
-	std::cout << "Temperature in Kelvin: " << temp.getTempKelvin() << "\n";
-	std::cout << "Temperature in Celsius: " << temp.getTempCelsius() << "\n";
-	std::cout << "Temperature in Fahrenheit: " << temp.getTempFahrenheit() << "\n";
+	temp.setTempCelsius();
+	temp.setTempFahrenheit();
+	std::cout << "Temperature in Kelvin: " << std::to_string(temp.getTempKelvin()) << "\n";
+	std::cout << "Temperature in Celsius: " << std::to_string(temp.getTempCelsius()) << "\n";
+	std::cout << "Temperature in Fahrenheit: " << std::to_string(temp.getTempFahrenheit()) << "\n";
 }

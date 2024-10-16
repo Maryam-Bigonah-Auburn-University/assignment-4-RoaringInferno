@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <queue>
 
 class Player
 {
@@ -50,17 +51,26 @@ int main()
         token += c;
       }
     }
+    std::cout << "String split\n";
 
     // Define token pop
-    const auto pop_token = [&tokens]() -> std::string
+    std::vector<std::string>::iterator it = tokens.begin();
+    const std::vector<std::string>::iterator it_end = tokens.end();
+    const auto pop_token = [&it]() -> std::string
     {
-      std::string token = tokens[0];
-      tokens.erase(tokens.begin());
-      return token;
+      std::string retval = *it;
+      it++;
+      return retval;
     };
+    const auto has_token = [&it, &it_end]() -> bool
+    {
+      return it != it_end;
+    };
+    std::cout << "Token pop defined\n";
 
     // The first token is the command name, remove it
     std::string commandName = pop_token();
+    std::cout << "Command name: " << commandName << "\n";
 
     // Hash across the possible command names
     /**
@@ -87,6 +97,24 @@ int main()
       SHOW = 3,
       QUIT = 1
     } commandID = static_cast<CommandID>((commandName[0] | 28) - 124);
+    std::cout << "Command ID calculated\n";
+
+    std::cout << std::to_string(static_cast<int>(commandID)) << "\n";
+    switch (commandID)
+    {
+      case CommandID::NEW:
+        std::cout << "new\n";
+        break;
+      case CommandID::DELETE:
+        std::cout << "delete\n";
+        break;
+      case CommandID::SHOW:
+        std::cout << "show\n";
+        break;
+      case CommandID::QUIT:
+        std::cout << "quit\n";
+        break;
+    }
 
     // Execute the command
     switch (commandID)
@@ -98,11 +126,11 @@ int main()
         // The token list now contains only the names
 
         // Add the players
-        while(players.size() < 10 && !tokens.empty()) // While there is space in the players vector
+        while(players.size() < 10 && has_token()) // While there is space in the players vector
         {
           players.push_back(Player(score, pop_token()));
         }
-        if (!tokens.empty()) // If there are still names to add (meaning the maximum number of players was reached)
+        if (has_token()) // If there are still names to add (meaning the maximum number of players was reached)
         {
           std::cout << "Warning: Maximum number of players reached.\n";
         }
@@ -111,7 +139,7 @@ int main()
       case CommandID::DELETE:
       {
         // Delete the players
-        while (!tokens.empty())
+        while (has_token())
         {
           const std::string name = pop_token();
           // Find the player with the given name
@@ -136,11 +164,11 @@ int main()
       {
         const auto display_player = [](const Player& player)
         {
-          std::cout << player.getName() << " " << player.getScore() << "\n";
+          std::cout << player.getName() << " " << std::to_string(player.getScore()) << "\n";
         };
 
         // Show the players
-        if (tokens.empty()) // If no names are given
+        if (!has_token()) // If no names are given
         {
           for (Player player : players)
           {
@@ -149,7 +177,7 @@ int main()
         }
         else // If names are given
         {
-          while (!tokens.empty())
+          while (has_token())
           {
             const std::string name = pop_token();
             // Find the player with the given name

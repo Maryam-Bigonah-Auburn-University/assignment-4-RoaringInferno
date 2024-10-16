@@ -2,7 +2,7 @@
 
 class GasPump {
 	private: // Constants
-		static const double GAS_DISPENSE_RATE = 0.1;
+		static constexpr double GAS_DISPENSE_RATE{0.1};
 	private: // Members
 		double amountDispensed,
 		       amountCharged,
