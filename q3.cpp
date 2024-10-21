@@ -3,6 +3,14 @@
 #include <vector>
 #include <queue>
 
+// #define DEBUG
+
+#ifdef DEBUG
+#define DEBUG_PRINT(x) std::cout << x << std::endl
+#else
+#define DEBUG_PRINT(x)
+#endif
+
 class Player
 {
  private:
@@ -34,7 +42,7 @@ int main()
   {
     std::cout << "> ";
     std::string command;
-    std::cin >> command;
+    std::getline(std::cin, command);
 
     // Split string by spaces
     std::vector<std::string> tokens;
@@ -43,15 +51,19 @@ int main()
     {
       if (c == ' ')
       {
-        tokens.push_back(token);
-        token = "";
+        if (token != "")
+        {
+          tokens.push_back(token);
+          token = "";
+        }
       }
       else
       {
         token += c;
       }
     }
-    std::cout << "String split\n";
+    if (token != "") tokens.push_back(token);
+    DEBUG_PRINT("String split");
 
     // Define token pop
     std::vector<std::string>::iterator it = tokens.begin();
@@ -66,11 +78,11 @@ int main()
     {
       return it != it_end;
     };
-    std::cout << "Token pop defined\n";
+    DEBUG_PRINT("Token pop defined");
 
     // The first token is the command name, remove it
     std::string commandName = pop_token();
-    std::cout << "Command name: " << commandName << "\n";
+    DEBUG_PRINT("Command name: " << commandName);
 
     // Hash across the possible command names
     /**
@@ -97,23 +109,24 @@ int main()
       SHOW = 3,
       QUIT = 1
     } commandID = static_cast<CommandID>((commandName[0] | 28) - 124);
-    std::cout << "Command ID calculated\n";
-
-    std::cout << std::to_string(static_cast<int>(commandID)) << "\n";
+    DEBUG_PRINT("CommandID" << std::to_string(static_cast<int>(commandID)));
     switch (commandID)
     {
       case CommandID::NEW:
-        std::cout << "new\n";
+        DEBUG_PRINT("Executing new");
         break;
       case CommandID::DELETE:
-        std::cout << "delete\n";
+        DEBUG_PRINT("Executing delete");
         break;
       case CommandID::SHOW:
-        std::cout << "show\n";
+        DEBUG_PRINT("Executing show");
         break;
       case CommandID::QUIT:
-        std::cout << "quit\n";
+        DEBUG_PRINT("Executing quit");
         break;
+      default:
+        std::cout << "Invalid command.\n";
+        continue;
     }
 
     // Execute the command
@@ -128,7 +141,9 @@ int main()
         // Add the players
         while(players.size() < 10 && has_token()) // While there is space in the players vector
         {
-          players.push_back(Player(score, pop_token()));
+          const std::string name = pop_token();
+          std::cout << "Adding player: \"" << name << "\" with score " << score << "\n";
+          players.push_back(Player(score, name));
         }
         if (has_token()) // If there are still names to add (meaning the maximum number of players was reached)
         {
@@ -138,6 +153,11 @@ int main()
       } // CommandID::NEW
       case CommandID::DELETE:
       {
+        if (!has_token()) // If no names are given
+        {
+          std::cout << "Warning: No names given.\n";
+          break;
+        }
         // Delete the players
         while (has_token())
         {
@@ -148,6 +168,7 @@ int main()
             bool deleted = false;
             if (players[i].getName() == name)
             {
+              std::cout << "Deleting player: \"" << name << "\"\n";
               players.erase(players.begin() + i);
               deleted = true;
               break;
@@ -155,6 +176,10 @@ int main()
             if (!deleted) // If the name is not one of the players
             {
               std::cout << "Warning: Player not found: " << name << "\n";
+              while (has_token())
+              {
+                std::cout << "Discarding: " << pop_token() << "\n";
+              }
             }
           }
         }
@@ -164,7 +189,7 @@ int main()
       {
         const auto display_player = [](const Player& player)
         {
-          std::cout << player.getName() << " " << std::to_string(player.getScore()) << "\n";
+          std::cout << "\"" << player.getName() << "\": " << std::to_string(player.getScore()) << "\n";
         };
 
         // Show the players

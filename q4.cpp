@@ -91,7 +91,7 @@ int main()
         token += c;
       }
     }
-    tokens.push_back(token);
+    if (token != "") tokens.push_back(token);
     DEBUG_PRINT("Split string by spaces, " << tokens.size() << " tokens");
     for (size_t i = 0; i < tokens.size(); i++)
     {
