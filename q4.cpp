@@ -2,6 +2,14 @@
 #include <array>
 #include <vector>
 
+// #define DEBUG
+
+#ifdef DEBUG
+#define DEBUG_PRINT(x) std::cout << x << std::endl;
+#else
+#define DEBUG_PRINT(x)
+#endif
+
 class Month
 {
 public:
@@ -41,6 +49,7 @@ public:
   Month& operator+=(const Month&);
   Month& operator-=(const Month&);
 
+  // These are non-functional(bugged) at the moment
   Month& operator++();
   Month& operator--();
   Month operator++(int);
@@ -49,6 +58,12 @@ private:
   MonthID mnth;
 };
 
+const std::string console_output_leader = ":= ";
+void push_console_output_leader()
+{
+  std::cout << console_output_leader;
+}
+
 int main()
 {
   Month month;
@@ -56,7 +71,7 @@ int main()
   {
     std::cout << "> ";
     std::string command;
-    std::cin >> command;
+    std::getline(std::cin, command);
 
     // Split string by spaces
     std::vector<std::string> tokens;
@@ -65,13 +80,22 @@ int main()
     {
       if (c == ' ')
       {
-        tokens.push_back(token);
-        token = "";
+        if (token != "")
+        {
+          tokens.push_back(token);
+          token = "";
+        }
       }
       else
       {
         token += c;
       }
+    }
+    tokens.push_back(token);
+    DEBUG_PRINT("Split string by spaces, " << tokens.size() << " tokens");
+    for (size_t i = 0; i < tokens.size(); i++)
+    {
+      DEBUG_PRINT("tokens[" << i << "] = " << token);
     }
 
     // Define token pop
@@ -81,8 +105,10 @@ int main()
       tokens.erase(tokens.begin());
       return token;
     };
+    DEBUG_PRINT("Defined pop_token");
 
     std::string commandName = pop_token();
+    DEBUG_PRINT("Got command name: " << commandName);
     /**
      * Interface:
      * - set <month string> : Set the month
@@ -108,40 +134,53 @@ int main()
       STRING = 0,
       NUMBER = 11,
       QUIT = 7
-    } commandID = static_cast<CommandID>((commandName[0] | 16) - 114);
+    } commandID = static_cast<CommandID>((commandName[2] | 16) - 114);
+    DEBUG_PRINT("Got command ID: " << static_cast<int>(commandID));
 
     switch (commandID)
     {
       case CommandID::SET:
       {
+        DEBUG_PRINT("Executing SET");
         std::string monthString = pop_token();
-        Month newMonth(monthString[0], monthString[1], monthString[2]);
-        month = newMonth;
+        month = Month(monthString[0], monthString[1], monthString[2]);
+        break;
       } // case CommandID::SET
       case CommandID::NEXT:
       {
-        month++;
+        DEBUG_PRINT("Executing NEXT");
+        month += 1;
+        break;
       } // case CommandID::NEXT
       case CommandID::PREV:
       {
-        month--;
+        DEBUG_PRINT("Executing PREV");
+        month -= 1;
+        break;
       } // case CommandID::PREV
       case CommandID::STRING:
       {
+        DEBUG_PRINT("Executing STRING");
+        push_console_output_leader();
         month.outputMonthName(std::cout);
         std::cout << "\n";
+        break;
       } // case CommandID::STRING
       case CommandID::NUMBER:
       {
+        DEBUG_PRINT("Executing NUMBER");
+        push_console_output_leader();
         month.outputMonthNumber(std::cout);
         std::cout << "\n";
+        break;
       } // case CommandID::NUMBER
       case CommandID::QUIT:
       {
+        DEBUG_PRINT("Executing QUIT");
         return 0;
       } // case CommandID::QUIT
     } // switch (commandID)
-  }
+  } // while(true)
 }
 
 Month::Month(char c1, char c2, char c3) :
@@ -236,6 +275,8 @@ Month::MonthID Month::month_from_String(const std::array<char, 3> &input_string)
     return MonthID::NOVEMBER;
   case 44:
     return MonthID::DECEMBER;
+  default:
+    return MonthID::JANUARY;
   }
 }
 Month::MonthID Month::month_from_string(const std::array<char, 3> &input_string)
@@ -282,6 +323,8 @@ Month::MonthID Month::month_from_string(const std::array<char, 3> &input_string)
     return MonthID::NOVEMBER;
   case 12:
     return MonthID::DECEMBER;
+  default:
+    return MonthID::JANUARY;
   }
 }
 Month::MonthID Month::month_from_number(const int number)
